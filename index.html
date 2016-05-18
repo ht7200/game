@@ -31,6 +31,19 @@
         background: #257B2B;
         border: 1px solid red;
         margin: 100px auto;
+        position: relative;
+    }
+    #controlDesk {
+        width: 980px;
+        height: 508px;
+        background: #3c3c3c;
+        border: 1px solid red;
+                opacity: .2;
+        filter: alpha(opacity: 20);
+        position: absolute;
+        top:0;
+        left: 0;
+        z-index: 10;
     }
     
     #ball {
@@ -73,9 +86,11 @@
         <div id="box">
             <div id="progress"></div>
         </div>
+         
         <div class="desk">
             <div id="ball"></div>
             <div id="cue"></div>
+            <!-- <div id="controlDesk"></div> -->
         </div>
     </div>
     <script>
@@ -110,8 +125,8 @@
 
     //找到母球位置
     function fondCue() {
-        xx = oCue.offset().left + w / 2;
-        yy = oCue.offset().top + h / 2;
+        xx = oCue.offset().left -iLeft  + w / 2;
+        yy = oCue.offset().top -iTop + h / 2;  
 
         return {
             cX: parseInt(xx),
@@ -121,17 +136,17 @@
 
     //边界限制
     function inBoundary(x, y) {
-        var l = iWidth + iLeft - w;
-        var t = iHeight + iTop - h;
+        var l = iWidth  - w;
+        var t = iHeight  - h;
 
-        if (x < iLeft) {
-            x = iLeft;
+        if (x < 0) {
+            x = 0;
         } else if (x > l) {
             x = l;
         };
 
-        if (y < iTop) {
-            y = iTop;
+        if (y < 0) {
+            y = 0;
         } else if (y > t) {
             y = t;
         };
@@ -147,10 +162,9 @@
         var x = parseInt(e.clientX - iLeft - w / 2);
         var y = parseInt(e.clientY - iTop - h / 2);
 
-        X = x + iLeft;
-        Y = y + iTop;
+        console.log(x,y);
 
-        var lb = inBoundary(X, Y);
+        var lb = inBoundary(x, y);
 
         //放置目标球
         oBall.css({
@@ -181,16 +195,21 @@
         Pheight = $("#progress").height();
         Pheight=Pheight + 2;
         $("#progress").css({height:Pheight});
-        console.log(Pheight);
+        
         if (Pheight >= 200) {
             clearInterval(finish);
         }
     }
 
-    cue.onmousedown = function() {
+    // $("#controlDesk").click(function(){
+    // 	alert("clicked");
+    // })
+
+    ball.bonmousedown = function() {
+    	alert("clicked");
     	$("#progress").css({height:0});
         var finish = setInterval(run, 10);
-        cue.onmouseup = function() {
+        ball.onmouseup = function() {
             clearInterval(finish);
         }
     }
