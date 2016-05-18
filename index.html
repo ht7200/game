@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <script type="text/javascript" src="js/jquery-1.12.0.min.js"></script>
+    <title>台球</title>
+    <style>
+    #box {
+        width: 20px;
+        height: 300px;
+        line-height: 300px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        float: left;
+        margin-left: 200px;
+    }
+    
+    #progress {
+        width: 20px;
+        height: 10px;
+        background: red;
+        border-radius: 5px;
+        display: inline-block;
+        vertical-align: bottom;
+    }
+    
+    .desk {
+        width: 980px;
+        height: 508px;
+        background: #257B2B;
+        border: 1px solid red;
+        margin: 100px auto;
+    }
+    
+    #ball {
+        width: 50px;
+        height: 50px;
+        background: #807D7D;
+        border-radius: 25px;
+        position: absolute;
+        cursor: move;
+        opacity: .4;
+        filter: alpha(opacity: 40);
+        top: 100px;
+        left: 300px;
+    }
+    
+    #cue {
+        width: 50px;
+        height: 50px;
+        background: #807D7D;
+        border-radius: 25px;
+        position: absolute;
+        top: 220px;
+        left: 450px;
+    }
+    
+    .patt-lines {
+        height: 0;
+        border: 1px dashed #fff;
+        position: absolute;
+        transform-origin: 1px 1px;
+        -ms-transform-origin: 1px 1px;
+        /* IE 9 */
+        -webkit-transform-origin: 1px 1px;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div id="box">
+            <div id="progress"></div>
+        </div>
+        <div class="desk">
+            <div id="ball"></div>
+            <div id="cue"></div>
+        </div>
+    </div>
+    <script>
+    var oWraper = $(".wraper");
+    var oDesk = $(".desk");
+    var oBall = $("#ball");
+    var oCue = $("#cue")
+    var iTop = oDesk.offset().top;
+    var iLeft = oDesk.offset().left;
+    var iWidth = oDesk.width();
+    var iHeight = oDesk.height();
+    var w = oBall.width();
+    var h = oBall.height();
+
+    var lc = fondCue();
+
+    //to create new line
+    var line = $('<div class="patt-lines" style="top:' + lc.cY + 'px; left:' + lc.cX + 'px"></div>');
+    //add on dom
+    oDesk.append(line);
+
+    //return height and angle for lines
+    function getLengthAngle(obj, y2, x2) {
+        var xDiff = x2 - obj.cX,
+            yDiff = y2 - obj.cY;
+
+        return {
+            length: Math.ceil(Math.sqrt(xDiff * xDiff + yDiff * yDiff)),
+            angle: Math.round((Math.atan2(yDiff, xDiff) * 180) / Math.PI)
+        };
+    }
+
+    //找到母球位置
+    function fondCue() {
+        xx = oCue.offset().left + w / 2;
+        yy = oCue.offset().top + h / 2;
+
+        return {
+            cX: parseInt(xx),
+            cY: parseInt(yy)
+        }
+    }
+
+    //边界限制
+    function inBoundary(x, y) {
+        var l = iWidth + iLeft - w;
+        var t = iHeight + iTop - h;
+
+        if (x < iLeft) {
+            x = iLeft;
+        } else if (x > l) {
+            x = l;
+        };
+
+        if (y < iTop) {
+            y = iTop;
+        } else if (y > t) {
+            y = t;
+        };
+        return {
+            xx: x,
+            yy: y
+        }
+    }
+
+
+    var eventMove = function(e) {
+        var e = e || window.event;
+        var x = parseInt(e.clientX - iLeft - w / 2);
+        var y = parseInt(e.clientY - iTop - h / 2);
+
+        X = x + iLeft;
+        Y = y + iTop;
+
+        var lb = inBoundary(X, Y);
+
+        //放置目标球
+        oBall.css({
+            left: lb.xx,
+            top: lb.yy
+        });
+
+        //连线
+        var Bx = lb.xx + w / 2,
+            By = lb.yy + h / 2;
+        var lA = getLengthAngle(lc, By, Bx);
+
+        line.css({
+            'width': lA.length + 'px',
+            'transform': 'rotate(' + lA.angle + 'deg)'
+        });
+
+
+        return false;
+    };
+
+
+    oDesk.mousemove(eventMove);
+
+    
+
+    function run() {
+        Pheight = $("#progress").height();
+        Pheight=Pheight + 2;
+        $("#progress").css({height:Pheight});
+        console.log(Pheight);
+        if (Pheight >= 200) {
+            clearInterval(finish);
+        }
+    }
+
+    cue.onmousedown = function() {
+    	$("#progress").css({height:0});
+        var finish = setInterval(run, 10);
+        cue.onmouseup = function() {
+            clearInterval(finish);
+        }
+    }
+
+
+    </script>
+</body>
+
+</html>
